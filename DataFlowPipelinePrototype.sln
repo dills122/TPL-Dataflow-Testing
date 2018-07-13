@@ -5,9 +5,13 @@ VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataFlowPipelinePrototype", "DataFlowPipelinePrototype\DataFlowPipelinePrototype.csproj", "{04FF216B-C7E1-4D07-A47E-57B2305167CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessingPrototype", "ProcessingPrototype\ProcessingPrototype.csproj", "{58904C9B-F2AB-44ED-B103-E5C8B04A0C9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessingPrototype", "ProcessingPrototype\ProcessingPrototype.csproj", "{58904C9B-F2AB-44ED-B103-E5C8B04A0C9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessingPipelineTests", "ProcessingPipelineTests\ProcessingPipelineTests.csproj", "{688B8B45-1506-48B8-8DB0-707E90B70D53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessingPipelineTests", "ProcessingPipelineTests\ProcessingPipelineTests.csproj", "{688B8B45-1506-48B8-8DB0-707E90B70D53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderProcessingPipeline", "OrderProcessingPipeline\OrderProcessingPipeline.csproj", "{59606647-F048-4E10-86DB-51FD45527BEF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderPipelineTets", "OrderPipelineTets\OrderPipelineTets.csproj", "{8320871F-D2E8-4149-8874-EFEF0434914E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +31,14 @@ Global
 		{688B8B45-1506-48B8-8DB0-707E90B70D53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{688B8B45-1506-48B8-8DB0-707E90B70D53}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{688B8B45-1506-48B8-8DB0-707E90B70D53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59606647-F048-4E10-86DB-51FD45527BEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59606647-F048-4E10-86DB-51FD45527BEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59606647-F048-4E10-86DB-51FD45527BEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59606647-F048-4E10-86DB-51FD45527BEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8320871F-D2E8-4149-8874-EFEF0434914E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8320871F-D2E8-4149-8874-EFEF0434914E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8320871F-D2E8-4149-8874-EFEF0434914E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8320871F-D2E8-4149-8874-EFEF0434914E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

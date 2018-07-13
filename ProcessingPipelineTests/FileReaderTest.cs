@@ -12,7 +12,7 @@ namespace ProcessingPipelineTests
     {
         [Theory]
         [InlineData(".\\EntryInformation.json")]
-        [InlineData(".\\EntryInformations.json")]
+        //[InlineData(".\\EntryInformations.json")]
         public async Task TestFileReader(string FilePath)
         {
             Processing processing = new Processing();
