@@ -1,0 +1,100 @@
+﻿{
+  "Appraisals": [
+    {
+      "Lender": "Chase",
+      "ClientId": 5647115421,
+      "ClientName": "Jane S. Doe",
+      "ClientAddress": "500 Main St",
+      "ClientState": "MI",
+      "ClientZip": "48226"
+    },
+    {
+      "Lender": "Chase",
+      "ClientId": 562121,
+      "ClientName": "Bill S. Doe",
+      "ClientAddress": "500 Main St",
+      "ClientState": "MI",
+      "ClientZip": "48226"
+    },
+    {
+      "Lender": "Chase",
+      "ClientId": 567564711,
+      "ClientName": "Barry S. Doe",
+      "ClientAddress": "500 Main St",
+      "ClientState": "MI",
+      "ClientZip": "48226"
+    },
+    {
+      "Lender": "Chase",
+      "ClientId": 5674534716,
+      "ClientName": "Bobby S. Doe",
+      "ClientAddress": "500 Main St",
+      "ClientState": "MI",
+      "ClientZip": "48226"
+    },
+    {
+      "Lender": "Chase",
+      "ClientId": 563353,
+      "ClientName": "Bobby S. Doe",
+      "ClientAddress": "500 Main St",
+      "ClientState": "MI",
+      "ClientZip": "48226"
+    },
+    {
+      "Lender": "Chase",
+      "ClientId": 5633222,
+      "ClientName": "Manny S. Doe",
+      "ClientAddress": "500 Main St",
+      "ClientState": "MI",
+      "ClientZip": "48226"
+    },
+    {
+      "Lender": "Chase",
+      "ClientId": 56331212,
+      "ClientName": "Jane S. Doe",
+      "ClientAddress": "500 Main St",
+      "ClientState": "MI",
+      "ClientZip": "48226"
+    },
+    {
+      "Lender": "Chase",
+      "ClientId": 5633121,
+      "ClientName": "Paul S. Doe",
+      "ClientAddress": "500 Main St",
+      "ClientState": "MI",
+      "ClientZip": "48226"
+    },
+    {
+      "Lender": "Chase",
+      "ClientId": 355633323,
+      "ClientName": "John S. Doe",
+      "ClientAddress": "500 Main St",
+      "ClientState": "MI",
+      "ClientZip": "48226"
+    },
+    {
+      "Lender": "Chase",
+      "ClientId": 2333321,
+      "ClientName": "John S. Smith",
+      "ClientAddress": "500 Main St",
+      "ClientState": "MI",
+      "ClientZip": "48226"
+    },
+    {
+      "Lender": "Chase",
+      "ClientId": 3433321,
+      "ClientName": "John S. Wood",
+      "ClientAddress": "500 Main St",
+      "ClientState": "MI",
+      "ClientZip": "48226"
+    },
+    {
+      "Lender": "Chase",
+      "ClientId": 5323321,
+      "ClientName": "Jane S. Smith",
+      "ClientAddress": "500 Main St",
+      "ClientState": "MI",
+      "ClientZip": "48226"
+    }
+  ]
+}
