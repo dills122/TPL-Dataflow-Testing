@@ -55,7 +55,7 @@ namespace DataFlowPipelinePrototype
             ReadJsonIn.LinkTo(TransformToObject, linkOptions);
             TransformToObject.LinkTo(GenerateEvents, linkOptions);
 
-            ReadJsonIn.Post(".\\ForeignSchema.json");
+            ReadJsonIn.Post(".\\EntrySchema.json");
 
             ReadJsonIn.Complete();
 
