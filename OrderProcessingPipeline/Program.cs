@@ -7,6 +7,9 @@ namespace OrderProcessingPipeline
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
+
+            Pipeline pipeline = new Pipeline();
+            pipeline.StartPipeline();
         }
     }
 }

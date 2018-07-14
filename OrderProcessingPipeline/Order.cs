@@ -40,7 +40,7 @@ namespace OrderProcessingPipeline
         public LenderInformation lenderInformation { get; set; }
         public Other other { get; set; }
 
-        List<Document> documents { get; set; }
+        public List<Document> documents { get; set; }
 
         //Need more order details
 
@@ -52,7 +52,7 @@ namespace OrderProcessingPipeline
 
         public Order RandomOrder()
         {
-            const int NAMES = 6;
+            const int NAMES = 5;
             string[] firstNames = { "John", "Jane", "Joe", "Jen", "Bob", "Beth" };
             string[] lastNames = { "Smith", "Stone", "Doe", "Miller", "Davis", "Wilson" };
 
@@ -62,8 +62,8 @@ namespace OrderProcessingPipeline
             clientInformation = new ClientInformation {
                 clientAddressOne = random.Next(100, 5000).ToString() + " Main St",
                 clientAddressTwo = "Apt " + random.Next(100, 700).ToString(),
-                clientFName = firstNames[random.Next(NAMES) - 1],
-                clientLName = lastNames[random.Next(NAMES) - 1],
+                clientFName = firstNames[random.Next(NAMES) ],
+                clientLName = lastNames[random.Next(NAMES)],
                 clientCreditScore = random.Next(550, 850),
                 clientSSN = random.Next(100000000, 999999999),
                 clientState = "PA",
@@ -82,6 +82,7 @@ namespace OrderProcessingPipeline
 
             if(random.Next(550) % 2 == 0)
             {
+                documents = new List<Document>();
                 documents.Add(new Document
                 {
                     documentNameHash = "DocumentHashName",
