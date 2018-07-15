@@ -10,6 +10,8 @@ namespace OrderProcessingPipeline
 
             Pipeline pipeline = new Pipeline();
             pipeline.StartPipeline();
+
+            Console.ReadKey();
         }
     }
 }

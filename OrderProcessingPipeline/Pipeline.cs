@@ -1,138 +1,171 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks.Dataflow;
 
 namespace OrderProcessingPipeline
 {
     class Pipeline
     {
-        //private readonly int _batchBlock = 10;
         TransformBlock<Order, Order> receiveData;
         BroadcastBlock<Order> broadcastOrder;
-        //All Processing Blocks return types will change
-        //As they will be procesing individual parts of the Order
-        //Then returning all the processed data back to the compile block
-        TransformBlock<Order, ClientTransform> processClient;
-        TransformBlock<Order, LenderTransform> processLender;
-        TransformBlock<Order, Order> processOrder;
+        TransformBlock<Order, InvolvedPartyTransforms> processInvolvedParties;
+        TransformBlock<Order, OrderTransform> processOrder;
         TransformBlock<Order, DocumentTransform> processDocuments;
-
-        TransformBlock<Tuple<DocumentTransform, ClientTransform, LenderTransform>, Order> compileInformation;
+        TransformBlock<Tuple<DocumentTransform, InvolvedPartyTransforms, OrderTransform>, Order> compileInformation;
         TransformBlock<Order, Order> processOther;
         TransformBlock<Order, Order> executeTransaction;
+
+        CancellationTokenSource cancellationTokenSource;
 
         public Pipeline()
         { }
 
         /// <summary>
-        /// Pipeline Start without Broadcasting
-        /// No parallel processing either
+        ///                              Recieve Data
+        ///                                    |
+        ///                                Broadcast
+        ///                  __________________|_________________
+        ///              Document      Involved Parties        Order
+        ///                 |__________________|_________________|
+        ///                                    |
+        ///                            Compile InformationS
         /// </summary>
         public void StartPipeline()
         {
-            //var batchBlock = new BatchBlock<Order>(_batchBlock);
             ////TODO Need to add Buffer block to recieve batch post, then fill pipeline
             //Broadcasts the received data 
             broadcastOrder = new BroadcastBlock<Order>(order => order);
+            //Joins all the parallel processes together to output for compiling
+            var joinblock = new JoinBlock<DocumentTransform, InvolvedPartyTransforms, OrderTransform>(new GroupingDataflowBlockOptions { Greedy = false });
+            
+            //Add cancelation to the pipeline
+            cancellationTokenSource = new CancellationTokenSource();
+
+            ExecutionDataflowBlockOptions executionDataflowBlockOptions = new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationTokenSource.Token
+            };
 
             //Receives input orders
             receiveData = new TransformBlock<Order, Order>(order =>
             {
                 return order != null ? order : null;
-            });
-            //TODO More processing 
-            //Processes client information
-            processClient = new TransformBlock<Order, ClientTransform>(order =>
-            {
-                    ClientInformation clientInformation = order.clientInformation;
+            }, executionDataflowBlockOptions);
 
-                if(ClientVerification.CheckCreditScore(clientInformation.clientCreditScore))
+            //Processes Client/Lender information
+            processInvolvedParties = new TransformBlock<Order, InvolvedPartyTransforms>(order =>
+            {
+
+                if (ClientVerification.VerifyClient(order.clientInformation).Result && ClientVerification.VerifyLender(order.lenderInformation).Result)
                 {
-                    //TODO generate events
                     ClientTransform clientTransform = new ClientTransform
                     {
-                        ClientInformation = clientInformation
+                        ClientInformation = order.clientInformation
                     };
-
-                    return clientTransform;
-                }
-                //TODO add cancelation Tokens
-                return null;
-            });
-            //TODO more processing 
-            //Processes lender information
-            processLender = new TransformBlock<Order, LenderTransform>(order =>
-            {
-                LenderInformation lenderInformation = order.lenderInformation;
-                if (lenderInformation.lenderName == "Quicken Loans")
-                {
-                    //TODO generate events
                     LenderTransform lenderTransform = new LenderTransform
                     {
-                        lenderInformation = lenderInformation
+                        lenderInformation = order.lenderInformation
                     };
-
-                    return lenderTransform;
+                    InvolvedPartyTransforms involvedPartyTransforms = new InvolvedPartyTransforms
+                    {
+                        lenderTransform = lenderTransform,
+                        clientTransform = clientTransform
+                    };
+                    return involvedPartyTransforms;
                 }
+                return null;
+            }, executionDataflowBlockOptions);
+            
+            //Processes Order Information
+            processOrder = new TransformBlock<Order, OrderTransform>(order =>
+            {
+                OrderTransform orderTransform = new OrderTransform
+                {
+                    order = order
+                };
+                return orderTransform;
+            }, executionDataflowBlockOptions);
 
-                    return null;
-            });
             //TODO add more processing
             //Processes Documents from order
             processDocuments = new TransformBlock<Order, DocumentTransform>(order =>
             {
                 List<Document> documents = order.documents;
-                if(documents.Count < 0)
-                { return null; }
+                //if(documents.Count < 0)
+                //{ return null; }
 
-                foreach(Document document in documents)
-                {
-                    if(document == null)
-                    { return null; }
-                }
+                //foreach(Document document in documents)
+                //{
+                //    if(document == null)
+                //    { return null; }
+                //}
                 //TODO generate events
                 DocumentTransform documentTransform = new DocumentTransform
                 {
                     documents = documents
                 };
                 return documentTransform;
-            });
+            }, executionDataflowBlockOptions);
 
-            //compileInformation = new TransformBlock<Tuple<DocumentTransform, ClientTransform, LenderTransform>, Order>((transforms) =>
-            //{
+            //Compiles the information back after processing
+            compileInformation = new TransformBlock<Tuple<DocumentTransform, InvolvedPartyTransforms, OrderTransform>, Order>((transforms) =>
+            {
+                Console.WriteLine("Compiling Order #{0}", transforms.Item3.order.orderId);
+                Console.WriteLine("Lender: {0} | Client: {1}", 
+                    transforms.Item2.lenderTransform.lenderInformation.lenderName,
+                    transforms.Item2.clientTransform.ClientInformation.clientFName + ' ' +
+                    transforms.Item2.clientTransform.ClientInformation.clientLName);
+                return transforms.Item3.order;
+            }, executionDataflowBlockOptions);
 
-            //    //TODO Order info not available here, but is needed 
-            //});
+            //Linking options
+            var options = new DataflowLinkOptions { PropagateCompletion = true};
 
-            //batchBlock.LinkTo(buffer);
             receiveData.LinkTo(broadcastOrder);
             //Broadcasts received data to processing blocks
-            broadcastOrder.LinkTo(processClient);
-            broadcastOrder.LinkTo(processLender);
+            broadcastOrder.LinkTo(processInvolvedParties);
+            broadcastOrder.LinkTo(processOrder);
             broadcastOrder.LinkTo(processDocuments);
 
-            //Joins all the parallel processes together to output for compiling
-            var joinblock = new JoinBlock<DocumentTransform, ClientTransform, LenderTransform>(new GroupingDataflowBlockOptions { Greedy = false });
-
-            var options = new DataflowLinkOptions { };
             processDocuments.LinkTo(joinblock.Target1, options);
-            processClient.LinkTo(joinblock.Target2, options);
-            processLender.LinkTo(joinblock.Target3, options);
+            processInvolvedParties.LinkTo(joinblock.Target2, options);
+            processOrder.LinkTo(joinblock.Target3, options);
             joinblock.LinkTo(compileInformation, options);
 
             //Creates random orders and posts them to the Pipeline Batchblock
-            for (int i = 0; i < 50; i++)
-            {
-                Random random = new Random();
+            //for (int i = 0; i < 50; i++)
+            //{
+            //    Random random = new Random();
 
-                Order order = new Order().RandomOrder();
+            //    Order order = new Order().RandomOrder();
 
-               // batchBlock.Post(order);
-            }
+            //}
 
-            //batchBlock.Completion.ContinueWith(delegate { buffer.Complete(); });
+            //Currently is just manually loading two orders
+            Order orderRand = new Order().RandomOrder();
 
+            var anotherOrder = new Order().RandomOrder();
+
+            receiveData.Post(orderRand);
+            receiveData.Post(anotherOrder);
+
+            receiveData.Complete();
+
+
+            const int TIMEOUT = 30000;
+            //compileInformation.Completion.Wait(TIMEOUT);
+
+
+            //Currently is just manually receiving two orders
+            var test = compileInformation.ReceiveAsync(cancellationTokenSource.Token);
+
+            Console.WriteLine("One: " + test.Result.orderId);
+
+            test = compileInformation.ReceiveAsync(cancellationTokenSource.Token);
+
+            Console.WriteLine("Two: " + test.Result.orderId);
         }
     }
 }

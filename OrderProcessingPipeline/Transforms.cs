@@ -40,6 +40,25 @@ namespace OrderProcessingPipeline
             TransformId = random.Next(100000, 999999);
         }
     }
+    public class InvolvedPartyTransforms
+    {
+        public LenderTransform lenderTransform { get; set; }
+        public ClientTransform clientTransform { get; set; }
+    }
+
+    public class OrderTransform
+    {
+        public int TransformId { get; private set; }
+        public List<Event> events { get; set; }
+        public Order order { get; set; }
+
+        public OrderTransform()
+        {
+            Random random = new Random();
+            TransformId = random.Next(100000, 999999);
+        }
+    }
+
     public enum EventType
     {
         Client,
