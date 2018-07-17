@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 
+
 namespace StockReportPipeline
 {
     class Program
@@ -17,19 +18,22 @@ namespace StockReportPipeline
         TransformBlock<string, List<Dividend>> GetDividendReports;
         TransformBlock<string, KeyStats> GetKeyStatInfo;
         TransformBlock<string, List<Interval>> GetIntervalReports;
-        TransformBlock<string, List<decimal>> GetChangesOverInterval;
+        TransformBlock<List<Interval>, List<decimal>> GetChangesOverInterval;
         BroadcastBlock<string> broadcastSymbol;
+        ActionBlock<Tuple<List<decimal>, List<Dividend>, KeyStats>> GenerateCompleteReport;
 
         static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
 
             Program program = new Program();
-            var company = program.RetrieveCompanyInfo("F");
-            var dividends = program.RetrieveDividendInfo("F");
-            var stats = program.RetrieveKeyStats("F");
-            var intervals = program.RetrieveIntervals("F",30);
-            var changes = program.ConstructIntervalReport(intervals);
+            //var company = program.RetrieveCompanyInfo("F");
+            //var dividends = program.RetrieveDividendInfo("F");
+            //var stats = program.RetrieveKeyStats("F");
+            //var intervals = program.RetrieveIntervals("F",30);
+            //var changes = program.ConstructIntervalReport(intervals);
+
+            program.StartPipeline();
             Console.ReadKey();
         }
 
@@ -53,15 +57,55 @@ namespace StockReportPipeline
                 return RetrieveKeyStats(symbol);
             });
 
-            GetChangesOverInterval = new TransformBlock<string, List<decimal>>(symbol =>
+            GetIntervalReports = new TransformBlock<string, List<Interval>>(symbol =>
             {
-                var intervals = RetrieveIntervals(symbol, 30);
+                return RetrieveIntervals(symbol, 30);
+            });
+
+            GetChangesOverInterval = new TransformBlock<List<Interval>, List<decimal>>(intervals =>
+            {
                 return ConstructIntervalReport(intervals);
             });
 
-            broadcastSymbol.LinkTo(GetChangesOverInterval);
+            GenerateCompleteReport = new ActionBlock<Tuple<List<decimal>, List<Dividend>, KeyStats>>(tup =>
+            {
+                Console.WriteLine("Company: {0}, Market Cap: {1}", tup.Item3.companyName, tup.Item3.marketcap);
+
+                foreach(Dividend div in tup.Item2)
+                {
+                    Console.WriteLine("Dividend Report: {0}", div.PaymentDate);
+                }
+                foreach(decimal dec in tup.Item1)
+                {
+                    Console.WriteLine("Percentage Change: {0}", dec);
+                }
+                //TODO Report Generation Area
+            });
+
+            var options = new DataflowLinkOptions { PropagateCompletion = true };
+
+            var buffer = new BufferBlock<string>();
+            buffer.LinkTo(broadcastSymbol);
+
+            //Broadcasts the symbol
+            broadcastSymbol.LinkTo(GetIntervalReports);
             broadcastSymbol.LinkTo(GetDividendReports);
             broadcastSymbol.LinkTo(GetKeyStatInfo);
+            //Second teir parallel 
+            GetIntervalReports.LinkTo(GetChangesOverInterval, options);
+            //Joins the parallel blocks back together
+            GetDividendReports.LinkTo(joinblock.Target2, options);
+            GetKeyStatInfo.LinkTo(joinblock.Target3, options);
+            GetChangesOverInterval.LinkTo(joinblock.Target1, options);
+
+            joinblock.LinkTo(GenerateCompleteReport, options);
+
+            buffer.Post("F");
+            buffer.Complete();
+
+            GenerateCompleteReport.Completion.Wait();
+
+
 
             //TODO need to finish pipeline and find better implementation
 
@@ -175,6 +219,11 @@ namespace StockReportPipeline
                 LastClose = CurrClose;
             }
             return changePercentages;
+        }
+
+        public void GenerateFinalReport()
+        {
+            
         }
     }
 }
