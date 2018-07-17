@@ -27,6 +27,17 @@ namespace OrderProcessingPipeline
         SupportingDocument,
         Other
     }
+
+    public enum OrderStatus
+    {
+        Initial,
+        Processing,
+        Verifying,
+        Sent,
+        Complete,
+        Invalid,
+        Rejected
+    }
     /// <summary>
     /// Order Object contains all information for a newly created order
     /// </summary>
@@ -34,6 +45,7 @@ namespace OrderProcessingPipeline
     {
         public Int32 orderId { get; private set; }
         public OrderType orderType { get; set; }
+        public OrderStatus orderStatus { get; set; }
         public DateTime createdDate { get; private set; }
 
         public ClientInformation clientInformation { get; set; }
@@ -58,6 +70,7 @@ namespace OrderProcessingPipeline
 
             Random random = new Random();
             orderType = (OrderType)(random.Next() % Enum.GetNames(typeof(OrderType)).Length);
+            orderStatus = OrderStatus.Initial;
 
             clientInformation = new ClientInformation {
                 clientAddressOne = random.Next(100, 5000).ToString() + " Main St",
@@ -88,7 +101,7 @@ namespace OrderProcessingPipeline
                     documentNameHash = "DocumentHashName",
                     documentBaseSixFour = "DocumentBase64",
                     documentExtension = "pdf",
-                    documentPath = "\\documents\\",
+                    documentPath = random.Next(50) % 2 ==  0? ".\\Files\\TestFileOne.txt" : ".\\Files\\TestFileTwo.txt",
                     documentType = (DocumentType)(random.Next() % Enum.GetNames(typeof(DocumentType)).Length)
                 });
             }

@@ -6,14 +6,14 @@ using System.Threading.Tasks.Dataflow;
 
 namespace OrderProcessingPipeline
 {
-    class Pipeline
+    public class Pipeline
     {
         TransformBlock<Order, Order> receiveData;
         BroadcastBlock<Order> broadcastOrder;
         TransformBlock<Order, InvolvedPartyTransforms> processInvolvedParties;
         TransformBlock<Order, OrderTransform> processOrder;
         TransformBlock<Order, DocumentTransform> processDocuments;
-        TransformBlock<Tuple<DocumentTransform, InvolvedPartyTransforms, OrderTransform>, Order> compileInformation;
+        TransformBlock<Tuple<DocumentTransform, InvolvedPartyTransforms, OrderTransform>,  Order> compileInformation;
         TransformBlock<Order, Order> processOther;
         TransformBlock<Order, Order> executeTransaction;
 
@@ -156,7 +156,6 @@ namespace OrderProcessingPipeline
 
             const int TIMEOUT = 30000;
             //compileInformation.Completion.Wait(TIMEOUT);
-
 
             //Currently is just manually receiving two orders
             var test = compileInformation.ReceiveAsync(cancellationTokenSource.Token);
