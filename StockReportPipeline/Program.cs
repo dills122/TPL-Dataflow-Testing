@@ -101,6 +101,11 @@ namespace StockReportPipeline
             joinblock.LinkTo(GenerateCompleteReport, options);
 
             buffer.Post("F");
+            buffer.Post("AGFS");
+            buffer.Post("BAC");
+            buffer.Post("FCF");
+
+
             buffer.Complete();
 
             GenerateCompleteReport.Completion.Wait();
@@ -205,20 +210,24 @@ namespace StockReportPipeline
             List<decimal> changePercentages = new List<decimal>();
             decimal CurrClose = 0;
             decimal LastClose = 0;
-            foreach (Interval interval in intervals)
+            if (intervals != null)
             {
-                if(intervals.IndexOf(interval) == 0) { LastClose = interval.close; continue; }
-                CurrClose = interval.close;
-
-                if (LastClose != 0)
+                foreach (Interval interval in intervals)
                 {
-                    var percentageChangeOverInterval = ((CurrClose - LastClose) / LastClose) * 100;
-                    changePercentages.Add(percentageChangeOverInterval);
-                }
+                    if (intervals.IndexOf(interval) == 0) { LastClose = interval.close; continue; }
+                    CurrClose = interval.close;
 
-                LastClose = CurrClose;
+                    if (LastClose != 0)
+                    {
+                        var percentageChangeOverInterval = ((CurrClose - LastClose) / LastClose) * 100;
+                        changePercentages.Add(percentageChangeOverInterval);
+                    }
+
+                    LastClose = CurrClose;
+                }
+                return changePercentages;
             }
-            return changePercentages;
+            return new List<decimal>();
         }
 
         public void GenerateFinalReport()
