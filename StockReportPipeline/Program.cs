@@ -19,6 +19,7 @@ namespace StockReportPipeline
             Console.WriteLine("Hello World!");
 
             Pipeline pipeline = new Pipeline();
+            pipeline.StartPipeline();
 
             Console.ReadKey();
         }

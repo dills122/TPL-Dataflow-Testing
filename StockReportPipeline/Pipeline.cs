@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using System.Xml.Serialization;
@@ -14,8 +15,9 @@ namespace StockReportPipeline
    public class Pipeline
     {
         //Constants
-        private HttpClient _client;
+        //private HttpClient _client;
         readonly string _baseUrl = "https://api.iextrading.com/1.0/";
+        const int MAXPARA = 2;
 
         TransformBlock<string, CompanyInfo> GetCompanyInfo;
         TransformBlock<string, List<Dividend>> GetDividendReports;
@@ -25,6 +27,7 @@ namespace StockReportPipeline
         BroadcastBlock<string> broadcastSymbol;
         TransformBlock<Tuple<List<decimal>, List<Dividend>, KeyStats>, string> GenerateXmlString;
         ActionBlock<string> GenerateCompleteReport;
+        CancellationTokenSource cancellationTokenSource;
 
         public Pipeline()
         {
@@ -32,35 +35,45 @@ namespace StockReportPipeline
         }
 
 
-        public Task StartPipeline()
+        public void StartPipeline()
         {
+
+            //Add cancelation to the pipeline
+            cancellationTokenSource = new CancellationTokenSource();
+
+            ExecutionDataflowBlockOptions executionDataflowBlockOptions = new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationTokenSource.Token,
+                MaxDegreeOfParallelism = MAXPARA
+            };
+
             broadcastSymbol = new BroadcastBlock<string>(symbol => symbol);
             var joinblock = new JoinBlock<List<decimal>, List<Dividend>, KeyStats>(new GroupingDataflowBlockOptions { Greedy = false });
 
             GetCompanyInfo = new TransformBlock<string, CompanyInfo>(symbol =>
             {
                 return RetrieveCompanyInfo(symbol);
-            });
+            }, executionDataflowBlockOptions);
 
             GetDividendReports = new TransformBlock<string, List<Dividend>>(symbol =>
             {
                 return RetrieveDividendInfo(symbol);
-            });
+            }, executionDataflowBlockOptions);
 
             GetKeyStatInfo = new TransformBlock<string, KeyStats>(symbol =>
             {
                 return RetrieveKeyStats(symbol);
-            });
+            }, executionDataflowBlockOptions);
 
             GetIntervalReports = new TransformBlock<string, List<Interval>>(symbol =>
             {
                 return RetrieveIntervals(symbol, 30);
-            });
+            }, executionDataflowBlockOptions);
 
             GetChangesOverInterval = new TransformBlock<List<Interval>, List<decimal>>(intervals =>
             {
                 return ConstructIntervalReport(intervals);
-            });
+            }, executionDataflowBlockOptions);
 
             GenerateXmlString = new TransformBlock<Tuple<List<decimal>, List<Dividend>, KeyStats>, string>(tup =>
             {
@@ -76,14 +89,14 @@ namespace StockReportPipeline
                 ser.Serialize(stringWriter, ReportObj);
                 return stringWriter.ToString();
 
-            });
+            }, executionDataflowBlockOptions);
 
             GenerateCompleteReport = new ActionBlock<string>(xml =>
             {
                 var str = Path.GetRandomFileName().Replace(".", "") + ".xml";
                 File.WriteAllText(str, xml);
                 Console.WriteLine("Finished File");
-            });
+            }, executionDataflowBlockOptions);
 
             var options = new DataflowLinkOptions { PropagateCompletion = true };
 
@@ -91,9 +104,9 @@ namespace StockReportPipeline
             buffer.LinkTo(broadcastSymbol);
 
             //Broadcasts the symbol
-            broadcastSymbol.LinkTo(GetIntervalReports);
-            broadcastSymbol.LinkTo(GetDividendReports);
-            broadcastSymbol.LinkTo(GetKeyStatInfo);
+            broadcastSymbol.LinkTo(GetIntervalReports, options);
+            broadcastSymbol.LinkTo(GetDividendReports, options);
+            broadcastSymbol.LinkTo(GetKeyStatInfo, options);
             //Second teir parallel 
             GetIntervalReports.LinkTo(GetChangesOverInterval, options);
             //Joins the parallel blocks back together
@@ -112,13 +125,14 @@ namespace StockReportPipeline
 
             buffer.Complete();
 
-            GenerateCompleteReport.Completion.Wait();
+
 
 
 
             //TODO need to finish pipeline and find better implementation
 
-            return Task.CompletedTask;
+            GenerateCompleteReport.Completion.Wait(cancellationTokenSource.Token);
+
         }
 
         /// <summary>
@@ -128,7 +142,7 @@ namespace StockReportPipeline
         /// <returns></returns>
         public CompanyInfo RetrieveCompanyInfo(string symbol)
         {
-            using (_client = new HttpClient())
+            using (HttpClient _client = new HttpClient())
             {
                 _client.BaseAddress = new Uri(_baseUrl);
 
@@ -149,7 +163,7 @@ namespace StockReportPipeline
         /// <returns></returns>
         public List<Dividend> RetrieveDividendInfo(string symbol)
         {
-            using (_client = new HttpClient())
+            using (HttpClient _client = new HttpClient())
             {
                 _client.BaseAddress = new Uri(_baseUrl);
                 var url = "stock/" + symbol + "/dividends/ytd";
@@ -175,11 +189,11 @@ namespace StockReportPipeline
                 MissingMemberHandling = MissingMemberHandling.Ignore
             };
 
-            using (_client = new HttpClient())
+            using (HttpClient _client = new HttpClient())
             {
-                _client.BaseAddress = new Uri(_baseUrl);
+                //_client.BaseAddress = new Uri(_baseUrl);
                 var url = "stock/" + symbol + "/stats";
-                var response = _client.GetAsync(url).Result;
+                var response = _client.GetAsync(_baseUrl+ url).Result;
                 if (response.IsSuccessStatusCode)
                 {
                     var result = response.Content.ReadAsStringAsync().Result;
@@ -197,7 +211,7 @@ namespace StockReportPipeline
         /// <returns></returns>
         public List<Interval> RetrieveIntervals(string symbol, int intervalValue)
         {
-            using (_client = new HttpClient())
+            using (HttpClient _client = new HttpClient())
             {
                 _client.BaseAddress = new Uri(_baseUrl);
                 var url = "stock/" + symbol + "/chart/ytd?chartInterval=" + intervalValue.ToString();
