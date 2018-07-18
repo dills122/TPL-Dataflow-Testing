@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderPipelineTets", "OrderP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockReportPipeline", "StockReportPipeline\StockReportPipeline.csproj", "{124F8210-B948-41BD-B2C4-E362699E49B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockReportTests", "StockReportTests\StockReportTests.csproj", "{60E25160-3DDD-43E4-861C-BDD479605E9B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockReportTests", "StockReportTests\StockReportTests.csproj", "{60E25160-3DDD-43E4-861C-BDD479605E9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContinuousPipeline", "ContinuousPipeline\ContinuousPipeline.csproj", "{8EB883B9-90EC-4399-A00A-618EB0CE622D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{60E25160-3DDD-43E4-861C-BDD479605E9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60E25160-3DDD-43E4-861C-BDD479605E9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60E25160-3DDD-43E4-861C-BDD479605E9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EB883B9-90EC-4399-A00A-618EB0CE622D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EB883B9-90EC-4399-A00A-618EB0CE622D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EB883B9-90EC-4399-A00A-618EB0CE622D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EB883B9-90EC-4399-A00A-618EB0CE622D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
