@@ -29,22 +29,15 @@ namespace StockReportPipeline
         ActionBlock<string> GenerateCompleteReport;
         CancellationTokenSource cancellationTokenSource;
 
-        public Pipeline()
-        {
-            
-        }
-
-
-        public void StartPipeline()
+        public Task StartPipeline()
         {
 
-            //Add cancelation to the pipeline
             cancellationTokenSource = new CancellationTokenSource();
 
             ExecutionDataflowBlockOptions executionDataflowBlockOptions = new ExecutionDataflowBlockOptions
             {
                 CancellationToken = cancellationTokenSource.Token,
-                MaxDegreeOfParallelism = MAXPARA
+                //MaxDegreeOfParallelism = MAXPARA
             };
 
             broadcastSymbol = new BroadcastBlock<string>(symbol => symbol);
@@ -101,7 +94,7 @@ namespace StockReportPipeline
             var options = new DataflowLinkOptions { PropagateCompletion = true };
 
             var buffer = new BufferBlock<string>();
-            buffer.LinkTo(broadcastSymbol);
+            buffer.LinkTo(broadcastSymbol, options);
 
             //Broadcasts the symbol
             broadcastSymbol.LinkTo(GetIntervalReports, options);
@@ -122,17 +115,28 @@ namespace StockReportPipeline
             buffer.Post("BAC");
             buffer.Post("FCF");
 
-
             buffer.Complete();
 
-
-
-
+            broadcastSymbol.Completion.ContinueWith(tsk =>
+            {
+                if (!tsk.IsFaulted)
+                {
+                    GetIntervalReports.Complete();
+                    GetDividendReports.Complete();
+                    GetKeyStatInfo.Complete();
+                }
+                else
+                {
+                    ((IDataflowBlock)GetIntervalReports).Fault(tsk.Exception);
+                    ((IDataflowBlock)GetDividendReports).Fault(tsk.Exception);
+                    ((IDataflowBlock)GetKeyStatInfo).Fault(tsk.Exception);
+                }
+            });
 
             //TODO need to finish pipeline and find better implementation
 
             GenerateCompleteReport.Completion.Wait(cancellationTokenSource.Token);
-
+            return Task.CompletedTask;
         }
 
         /// <summary>
