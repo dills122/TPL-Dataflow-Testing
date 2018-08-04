@@ -30,10 +30,19 @@ namespace ServiceClient.Controllers
 
             _pipelineService.WaitForResults();
 
-            var test = _pipelineService.GetResults();
+            var test = _pipelineService.GetResults().Result;
 
-
-            return View();
+            List<Order> receivedOrders = new List<Order>();
+            foreach (object inputOrder in test)
+            {
+                var order = (Order)inputOrder;
+                if (!string.IsNullOrEmpty(order.ClientFName))
+                {
+                    receivedOrders.Add((Order)inputOrder);
+                }
+            }
+            ViewBag.Orders = receivedOrders;
+            return View(receivedOrders);
         }
 
         public IActionResult About()
