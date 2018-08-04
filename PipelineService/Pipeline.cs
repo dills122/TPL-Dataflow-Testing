@@ -44,6 +44,12 @@ namespace PipelineService
             return Task.FromResult(_results);
         }
 
+        public Task FlushPipeline()
+        {
+            _results = new List<object>();
+            return Task.CompletedTask;
+        }
+
         public override ITargetBlock<object> InputBlock { get { return _inputBlock; } }
 
         public object Result { get { return _results; } }

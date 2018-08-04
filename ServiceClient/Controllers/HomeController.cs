@@ -31,7 +31,8 @@ namespace ServiceClient.Controllers
             _pipelineService.WaitForResults();
 
             var test = _pipelineService.GetResults().Result;
-
+            //Flush the results of the pipeline after receiving them
+            _pipelineService.FlushPipeline();
             List<Order> receivedOrders = new List<Order>();
             foreach (object inputOrder in test)
             {

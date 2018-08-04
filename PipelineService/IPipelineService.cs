@@ -12,5 +12,7 @@ namespace PipelineService
         Task WaitForResults();
 
         Task<List<object>> GetResults();
+
+        Task FlushPipeline();
     }
 }
