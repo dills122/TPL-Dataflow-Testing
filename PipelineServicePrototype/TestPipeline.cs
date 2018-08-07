@@ -1,4 +1,5 @@
 ﻿using Gridsum.DataflowEx;
+using PipelineServicePrototype.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,7 +8,7 @@ using System.Threading.Tasks.Dataflow;
 
 namespace PipelineServicePrototype
 {
-    public class TestPipeline : Dataflow<User>, IPipeline<User>
+    public class TestPipeline : Dataflow<User>, IPipeline<User, Response>
     {
         private TransformBlock<User, User> _inputBlock;
         private ActionBlock<User> _resultBlock;
@@ -73,6 +74,11 @@ namespace PipelineServicePrototype
         public Task<List<User>> GetResults()
         {
             return Task.FromResult(_results);
+        }
+
+        Task<List<Response>> IPipeline<User, Response>.GetResults()
+        {
+            throw new NotImplementedException();
         }
     }
 }
