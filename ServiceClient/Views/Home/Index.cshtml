@@ -2,7 +2,8 @@
     ViewData["Title"] = "Home Page";
 
 }
-@ViewBag.Orders;
+@*@ViewBag.Orders;*@
+@ViewBag.Users;
 <style>
     .loan-results {
         height: 3em;
@@ -13,13 +14,21 @@
 </style>
 <div class="col-md-12 col-lg-12">
     <div class="container">
-        @foreach (var item in ViewBag.Orders)
+        @*@foreach (var item in ViewBag.Orders)
         {
             <div class="col-md-4 loan-results">
                 <div>@item.ClientLName, @item.ClientFName</div>
                 <div> Loan Amount: @item.LoanTotal.ToString("C2")</div>
             </div>
 
-        }
+        }*@
+        @foreach (var item in ViewBag.Users)
+    {
+        <div class="col-md-4 loan-results">
+            <div>@item.Username, @item.Name</div>
+            <div></div>
+        </div>
+
+}
     </div>
 </div>

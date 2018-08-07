@@ -19,9 +19,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockReportTests", "StockRe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContinuousPipeline", "ContinuousPipeline\ContinuousPipeline.csproj", "{8EB883B9-90EC-4399-A00A-618EB0CE622D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceClient", "ServiceClient\ServiceClient.csproj", "{996AAFF7-15E0-4BD8-B858-B762CBD7A438}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceClient", "ServiceClient\ServiceClient.csproj", "{996AAFF7-15E0-4BD8-B858-B762CBD7A438}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineService", "PipelineService\PipelineService.csproj", "{441CB798-FF00-445E-B557-DB0A0198BD2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PipelineService", "PipelineService\PipelineService.csproj", "{441CB798-FF00-445E-B557-DB0A0198BD2C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PipelineServiceTests", "PipelineServiceTests\PipelineServiceTests.csproj", "{CD029576-5C7C-4293-A841-D9D10A5F81C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipelineServicePrototype", "PipelineServicePrototype\PipelineServicePrototype.csproj", "{7D090FB8-25D5-45E0-AC65-08A5DC49037B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +73,14 @@ Global
 		{441CB798-FF00-445E-B557-DB0A0198BD2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{441CB798-FF00-445E-B557-DB0A0198BD2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{441CB798-FF00-445E-B557-DB0A0198BD2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD029576-5C7C-4293-A841-D9D10A5F81C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD029576-5C7C-4293-A841-D9D10A5F81C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD029576-5C7C-4293-A841-D9D10A5F81C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD029576-5C7C-4293-A841-D9D10A5F81C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D090FB8-25D5-45E0-AC65-08A5DC49037B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D090FB8-25D5-45E0-AC65-08A5DC49037B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D090FB8-25D5-45E0-AC65-08A5DC49037B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D090FB8-25D5-45E0-AC65-08A5DC49037B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

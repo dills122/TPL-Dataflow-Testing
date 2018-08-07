@@ -35,7 +35,7 @@ namespace ServiceClient
             order.GuarantorName = guarantorNames[random.Next(NAMES)];
 
             order.LoanTotal = random.Next(10000, 4000000);
-            order.LoanDownPayment = random.Next(10000, (int)(order.LoanTotal * (decimal).50));
+            order.LoanDownPayment = random.Next(0, (int)(order.LoanTotal * (decimal).50));
             order.LoanFees = order.LoanTotal * (decimal).10;
             order.LoanTotal += order.LoanFees;
 

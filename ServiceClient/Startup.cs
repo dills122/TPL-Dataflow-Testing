@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PipelineService;
+using PipelineServicePrototype;
 
 namespace ServiceClient
 {
@@ -23,6 +24,7 @@ namespace ServiceClient
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IPipelineService, PipelineService.Pipeline>();
+            services.AddSingleton<IPipeline<User>, TestPipeline>();
             services.AddMvc();
         }
 

@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PipelineServicePrototype\PipelineServicePrototype.csproj" />
     <ProjectReference Include="..\PipelineService\PipelineService.csproj" />
   </ItemGroup>
 

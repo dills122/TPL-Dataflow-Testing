@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PipelineService;
 using PipelineService.Models;
+using PipelineService.Tests;
+using PipelineServicePrototype;
 using ServiceClient.Models;
 
 namespace ServiceClient.Controllers
@@ -13,37 +15,62 @@ namespace ServiceClient.Controllers
     public class HomeController : Controller
     {
         private IPipelineService _pipelineService;
-        public HomeController(IPipelineService pipelineService)
+        private IPipeline<User> _pipeline;
+
+        public HomeController(IPipelineService pipelineService, IPipeline<User> pipeline)
         {
             _pipelineService = pipelineService;
+            _pipeline = pipeline;
         }
 
-        public IActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            GenerateOrder randomOrder = new GenerateOrder(OrderType.CarLoan);
+            User user = new User();
+            user.Username = "dills122";
+            user.Name = "Dylan Steele";
 
-            _pipelineService.FillPipeline(randomOrder.order);
-            _pipelineService.FillPipeline(new GenerateOrder(OrderType.HomeLoan).order);
-            _pipelineService.FillPipeline(new GenerateOrder(OrderType.OtherLoan).order);
-            _pipelineService.FillPipeline(new GenerateOrder(OrderType.PersonalLoan).order);
-            _pipelineService.FillPipeline(new GenerateOrder(OrderType.CarLoan).order);
+            await _pipeline.Post(user);
+            await _pipeline.Complete();
+            await _pipeline.WaitForResultsAsync();
+            var users = _pipeline.GetResults().Result;
+            await _pipeline.Flush();
 
-            _pipelineService.WaitForResults();
+            //TestPipeline pipeline = new TestPipeline();
+            //pipeline.Post(user);
+            //pipeline.InputBlock.Complete();
+            //await pipeline.CompletionTask;
+            //var t = pipeline.Result;
+            //List<User> test = new List<User>();
+            //test.Add(user);
+            ViewBag.Users = users;
 
-            var test = _pipelineService.GetResults().Result;
-            //Flush the results of the pipeline after receiving them
-            _pipelineService.FlushPipeline();
-            List<Order> receivedOrders = new List<Order>();
-            foreach (object inputOrder in test)
-            {
-                var order = (Order)inputOrder;
-                if (!string.IsNullOrEmpty(order.ClientFName))
-                {
-                    receivedOrders.Add((Order)inputOrder);
-                }
-            }
-            ViewBag.Orders = receivedOrders;
-            return View(receivedOrders);
+            //TimingTest timingTest = new TimingTest();
+
+            //GenerateOrder randomOrder = new GenerateOrder(OrderType.CarLoan);
+
+            //_pipelineService.FillPipeline(randomOrder.order);
+            //_pipelineService.FillPipeline(new GenerateOrder(OrderType.HomeLoan).order);
+            //_pipelineService.FillPipeline(new GenerateOrder(OrderType.OtherLoan).order);
+            //_pipelineService.FillPipeline(new GenerateOrder(OrderType.PersonalLoan).order);
+            //_pipelineService.FillPipeline(new GenerateOrder(OrderType.CarLoan).order);
+
+            //_pipelineService.WaitForResults();
+
+            //var test = _pipelineService.GetResults().Result;
+            ////Flush the results of the pipeline after receiving them
+            //_pipelineService.FlushPipeline();
+            //List<Order> receivedOrders = new List<Order>();
+            //foreach (object inputOrder in test)
+            //{
+            //    var order = (Order)inputOrder;
+            //    if (!string.IsNullOrEmpty(order.ClientFName))
+            //    {
+            //        receivedOrders.Add((Order)inputOrder);
+            //    }
+            //}
+            //ViewBag.Orders = receivedOrders;
+
+            return View();
         }
 
         public IActionResult About()
