@@ -11,7 +11,9 @@ namespace PipelineServicePrototype.Services
     public class OrderJsonPipeline : Dataflow<Order>, IPipeline<Order, Response>
     {
         private TransformBlock<Order, Order> _inputBlock;
-        private ActionBlock<Order> _resultBlock;
+        private TransformBlock<Order, Response> _databaseInsert;
+        private TransformBlock<Order, Response> _fileGeneration;
+        private ActionBlock<Tuple<Response, Response>> _resultBlock;
 
         public override ITargetBlock<Order> InputBlock { get { return _inputBlock; } }
 
