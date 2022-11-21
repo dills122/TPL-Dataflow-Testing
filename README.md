@@ -1,5 +1,6 @@
 # TPL-Dataflow-Testing
 
+**Archiving this repo due to inactivity**
 
 This tutorial contains some examples that I built during the process of learning TPL. This is not a groomed repo so some of these examples might have errors or not work at all. 
 
